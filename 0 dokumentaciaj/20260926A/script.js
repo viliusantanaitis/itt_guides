@@ -109,18 +109,13 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
-// Užtikriname žemėlapio dydžio atnaujinimą keičiantis ekrano dydžiui (ypač išmaniajame)
-window.addEventListener('resize', function() {
-    map.invalidateSize();
-});
-
 let markerGroup = L.featureGroup().addTo(map);
 let userCoords = null; // Store user coordinates globally for distance filtering
 
 async function fetchAndDisplayPlaces(params = {}) {
     try {
         const urlParams = new URLSearchParams(params).toString();
-        const url = `/api/places/?${urlParams}`;
+        const url = `http://127.0.0.1:8700/api/places/?${urlParams}`;
         const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
@@ -238,7 +233,7 @@ function findUserLocation() {
 // Optimizuota filtravimo užkrova iš naujojo lengvo metaduomenų endpoint'o
 async function initFilters() {
     try {
-        const response = await fetch('/api/filters-meta/');
+        const response = await fetch('http://127.0.0.1:8700/api/filters-meta/');
         const data = await response.json();
         
         const citySelect = document.getElementById('city-select');

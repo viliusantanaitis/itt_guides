@@ -4,17 +4,17 @@
     <title>Places Map</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Lokalūs Leaflet failai iš dist aplanko -->
+    <!-- Leaflet stiliai iš static aplanko -->
     <link rel="stylesheet" href="/static/dist/leaflet.css" />
-    <!-- Pridėta ?v=2, kad telefonas nekauptų senos stilių atminties -->
-    <link rel="stylesheet" href="/static/styles.css?v=2" />
+    <!-- Jūsų stiliai iš static aplanko su cache-busting -->
+    <link rel="stylesheet" href="/static/styles.css?v=3" />
 </head>
 <body>
     <div id="app"></div>
 
-    <!-- Lokalūs Leaflet failai iš dist aplanko -->
+    <!-- Leaflet skriptas iš static aplanko -->
     <script src="/static/dist/leaflet.js"></script>
-    <!-- Pridėta ?v=2, kad telefonas įsikrautų patį naujausią kodą -->
-    <script src="/static/script.js?v=2"></script>
+    <!-- Jūsų script.js iš static aplanko su cache-busting -->
+    <script src="/static/script.js?v=3"></script>
 </body>
 </html>

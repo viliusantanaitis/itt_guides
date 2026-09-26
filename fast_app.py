@@ -32,8 +32,11 @@ app.add_middleware(
 )
 
 # Prijungiame statinius failus ir nuotraukas naudojant dinaminį kelią
-app.mount("/static", StaticFiles(directory=BASE_DIR), name="static")
-app.mount("/images", StaticFiles(directory=BASE_DIR / "images"), name="images")
+# Prijungiame statinius failus iš naujojo static aplanko
+app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
+
+# Kadangi images dabar yra viduje static/images:
+app.mount("/images", StaticFiles(directory=BASE_DIR / "static" / "images"), name="images")
 
 
 @app.get("/")
