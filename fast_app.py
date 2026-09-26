@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -7,6 +8,9 @@ from fastapi.staticfiles import StaticFiles
 import uvicorn
 
 from db_reader import db_reader
+
+# Nustatome bazinį katalogą dinamiškai (veiks ir pas jus, ir Render)
+BASE_DIR = Path(__file__).resolve().parent
 
 
 @asynccontextmanager
@@ -27,14 +31,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Prijungiame statinius failus ir nuotraukas
-app.mount("/static", StaticFiles(directory="/home/www/guides"), name="static")
-app.mount("/images", StaticFiles(directory="/home/www/guides/images"), name="images")
+# Prijungiame statinius failus ir nuotraukas naudojant dinaminį kelią
+app.mount("/static", StaticFiles(directory=BASE_DIR), name="static")
+app.mount("/images", StaticFiles(directory=BASE_DIR / "images"), name="images")
 
 
 @app.get("/")
 def read_index():
-    return FileResponse("/home/www/guides/guide.html")
+    return FileResponse(BASE_DIR / "guide.html")
 
 
 @app.get("/api/filters-meta/")
