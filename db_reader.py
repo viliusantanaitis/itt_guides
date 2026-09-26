@@ -19,7 +19,7 @@ class AsyncDatabaseReader:
 
     def _load_all_data(self) -> pd.DataFrame:
         """Automatiškai randa ir sujungia visus *_itg.csv failus iš guides_data aplanko."""
-        pattern = os.path.join(self.data_dir, "*_itg.csv")
+        pattern = os.path.join(self.data_dir, "*.csv")
         all_files = glob.glob(pattern)
         
         if not all_files:
