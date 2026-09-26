@@ -1,15 +1,31 @@
-body {
+/* Pagrindiniai nustatymai */
+body, html {
     padding: 0;
     margin: 0;
-}
-
-html, body, #app, #map {
-    width: 100%;
     height: 100%;
-    margin: 0;
-    padding: 0;
+    width: 100%;
+    overflow: hidden; /* Kad telefonas neslankiotų aukštyn-žemyn be reikalo */
 }
 
+#app {
+    height: 100%;
+    width: 100%;
+    position: relative;
+}
+
+/* Žemėlapio konteineris (turi užimti visą ekraną) */
+#map {
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+/* ==========================================
+   PAIEŠKOS KONTEINERIS (Viršutinė juosta)
+   ========================================== */
 .search-container {
     position: absolute;
     top: 0;
@@ -17,39 +33,41 @@ html, body, #app, #map {
     transform: translateX(-50%);
     z-index: 1000;
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: nowrap; /* Iš pradžių vienoje eilutėje */
     align-items: center;
-    gap: 10px;
-    padding: 8px 14px;
+    gap: 8px;
+    padding: 6px 10px;
     background: #d4ebd8;
     border: 1px solid #9ec5ab;
     border-radius: 0 0 8px 8px;
-    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2);
+    box-shadow: 0 2px 6px rgba(46, 125, 50, 0.2);
+    max-width: 95%; /* Kad nebūtų visiškai per visą ekraną */
+    box-sizing: border-box;
 }
 
 .search-container input {
-    width: 400px;
+    width: 200px; /* Kompiuteryje siauresnis laukelis, kad tilptų filtrai */
     border: 1px solid #9ec5ab;
-    background: #ffffff;
-    padding: 8px;
+    padding: 6px;
     border-radius: 4px;
-    font-size: 14px;
-    outline: none;
+    font-size: 13px;
 }
 
 .search-container select {
     border: 1px solid #9ec5ab;
-    background: #ffffff;
-    padding: 8px;
+    padding: 6px;
     border-radius: 4px;
-    font-size: 14px;
-    outline: none;
+    font-size: 13px;
+    max-width: 100px; /* Kad ilgas miesto pavadinimas neišstumtų kitų */
 }
 
-.search-container input:focus, 
-.search-container select:focus {
-    border-color: #2e7d32;
-    box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.2);
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: bold;
+    font-size: 12px;
+    white-space: nowrap;
 }
 
 .search-container button {
@@ -57,31 +75,47 @@ html, body, #app, #map {
     background-color: #2e7d32;
     color: white;
     border: 1px solid #1b5e20;
-    padding: 8px 12px;
+    padding: 6px 10px;
     border-radius: 4px;
-    font-size: 14px;
+    font-size: 12px;
     white-space: nowrap;
-    transition: background 0.2s;
 }
 
-.search-container button:hover {
-    background-color: #1b5e20;
-}
+/* ==========================================
+   MOBILIEJI STILIAI (Ekranams iki 800px)
+   ========================================== */
+@media screen and (max-width: 800px) {
+    .search-container {
+        flex-wrap: wrap; /* Leidžia elementams nusileisti į kitą eilutę */
+        justify-content: center;
+        gap: 5px;
+        padding: 4px;
+        top: 0;
+        left: 0;
+        transform: none;
+        width: 100%;
+        border-radius: 0; /* Per visą plotį be užapvalinimų */
+    }
 
-#show-all-button {
-    background-color: #2e7d32;
-    color: white;
-    border: 1px solid #1b5e20;
-}
+    .search-container input {
+        width: 100% !important; /* Paieška per visą plotį */
+        order: -1; /* Paieška pirma viršuje */
+        margin-bottom: 3px;
+    }
 
-#show-all-button:hover {
-    background-color: #a5d6a7;
-}
-
-.filter-group {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    white-space: nowrap;
-    font-weight: bold;
+    .search-container select, 
+    .filter-group, 
+    .search-container button {
+        flex: 1 1 48%; /* Filtrai ir mygtukai pasidalina per pusę */
+        box-sizing: border-box;
+        justify-content: center;
+    }
+    
+    .search-container label {
+        display: none; /* Paslepia tekstą "City:", "Theme:", lieka tik pasirinkimai */
+    }
+    
+    .search-container select {
+        max-width: 100%;
+    }
 }
