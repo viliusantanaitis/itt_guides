@@ -42,7 +42,7 @@ class AsyncDatabaseReader:
         themes = sorted(df['theme'].dropna().unique().tolist())
         
         # Konvertuojame tops į skaičius, jei įmanoma
-        tops = sorted(df['tops'].dropna().unique().tolist(), key=lambda x: int(x) if str(x).isdigit() else 0)
+        tops = sorted(list(set(str(int(float(x))) for x in df['tops'].dropna() if str(x).strip())), key=int)
 
         return {"cities": cities, "themes": themes, "tops": tops}
 
@@ -92,7 +92,7 @@ class AsyncDatabaseReader:
         if tops and tops.strip():
             try:
                 top_val = int(tops)
-                df = df[df['tops'].astype(int) <= top_val]
+                df = df[df['tops'].apply(lambda x: int(float(x)) <= top_val if str(x).strip() and str(x).replace('.', '', 1).isdigit() else False)]
             except ValueError:
                 pass
 
@@ -106,7 +106,7 @@ class AsyncDatabaseReader:
             
             mask = False
             for col in existing_cols:
-                mask = mask | df[col].astype(str).str.lower().str.contains(search_str, na=False)
+                mask = mask | df[col].astype(str).str.lower().str.contains(search_str, na=False, regex=False)
             df = df[mask]
 
         # Apribojame iki 1000 įrašų

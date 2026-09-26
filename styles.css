@@ -28,7 +28,7 @@ html, body, #app, #map {
 }
 
 .search-container input {
-    width: 440px;
+    width: 400px;
     border: 1px solid #9ec5ab;
     background: #ffffff;
     padding: 8px;
