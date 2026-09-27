@@ -179,12 +179,12 @@ async function fetchAndDisplayPlaces(params = {}) {
                 marker.bindPopup(`
                     <div style="width: 220px; text-align: left;">
                         ${place.image_url ? `<img src="${place.image_url}" alt="${place.name || ''}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 4px; margin-bottom: 8px;">` : ''}
-                        <div style="font-size: 13px; line-height: 1.4;">
-                            <b>Theme:</b> ${place.theme || ''}<br>
+                        <div style="font-size: 13px; line-height: 1.4;">                           
                             <b>Name:</b> ${place.name || ''}<br>
                             <b>Name Original:</b> ${place.name_original || ''}<br>
                             <b>Address:</b> ${place.address || ''}<br>
                             <b>Public Stops:</b> ${place.public_stops || ''}<br>
+                            <b>Theme:</b> ${place.theme || ''}<br>
                             <b>Tops:</b> ${place.tops || ''}<br>
                             <b>Description:</b> ${place.description || ''}<br>
                         </div>
