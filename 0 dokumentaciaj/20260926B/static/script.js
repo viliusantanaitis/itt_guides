@@ -184,7 +184,7 @@ async function fetchAndDisplayPlaces(params = {}) {
                             <b>Name:</b> ${place.name || ''}<br>
                             <b>Name Original:</b> ${place.name_original || ''}<br>
                             <b>Address:</b> ${place.address || ''}<br>
-                            <b>Public Stops:</b> ${place.public_stops || ''}<br>
+                            <b>Public Stop:</b> ${place.public_stop || ''}<br>
                             <b>Tops:</b> ${place.tops || ''}<br>
                             <b>Description:</b> ${place.description || ''}<br>
                         </div>
