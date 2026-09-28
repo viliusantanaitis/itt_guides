@@ -33,37 +33,18 @@ class AsyncDatabaseReader:
         return df
 
     async def get_filters_meta(self) -> Dict[str, List[Any]]:
-        """Gauna unikalių filtrų metaduomenis iš visų CSV failų su miestų objektų skaičiumi."""
+        """Gauna unikalių filtrų metaduomenis iš visų CSV failų."""
         df = self._load_all_data()
         if df.empty:
             return {"cities": [], "themes": [], "tops": []}
 
-        # Suskaičiuojame kiekvieno miesto objektų skaičių pagal didžiausią id (konvertuojant į int)
-        cities_data = []
-        for city_name, group in df.groupby('city'):
-            if not city_name.strip():
-                continue
-            # Randame didžiausią id reikšmę grupėje
-            max_id = 0
-            if 'id' in group.columns:
-                valid_ids = pd.to_numeric(group['id'], errors='coerce').dropna()
-                if not valid_ids.empty:
-                    max_id = int(valid_ids.max())
-            
-            cities_data.append({
-                "name": city_name,
-                "count": max_id if max_id > 0 else len(group)
-            })
-
-        # Surikiuojame miestus pagal abėcėlę
-        cities_data = sorted(cities_data, key=lambda x: x["name"])
-
+        cities = sorted(df['city'].dropna().unique().tolist())
         themes = sorted(df['theme'].dropna().unique().tolist())
         
         # Konvertuojame tops į skaičius, jei įmanoma
         tops = sorted(list(set(str(int(float(x))) for x in df['tops'].dropna() if str(x).strip())), key=int)
 
-        return {"cities": cities_data, "themes": themes, "tops": tops}
+        return {"cities": cities, "themes": themes, "tops": tops}
 
     async def get_places(self, filters: dict) -> List[Dict[str, Any]]:
         """Filtruoja įrašus iš CSV DataFrame pagal paduotus parametrus."""

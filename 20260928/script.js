@@ -69,6 +69,7 @@ const themeColors = {
     'Waterfronts & Beaches': '#FFD700'
 };
 
+// Ikonų kešas, kad nereikėtų jų pergeneruoti naršyklėje iš naujo kiekvienam taškui
 const iconCache = {};
 
 function createSvgIcon(color) {
@@ -88,8 +89,9 @@ function getMarkerColor(theme) {
     return themeColors[theme] || 'gray';
 }
 
+// Haversine formula to calculate distance in km
 function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371;
+    const R = 6371; // Earth radius in km
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = 
@@ -100,18 +102,20 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     return R * c;
 }
 
+// Initialize the map
 const map = L.map('map');
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
+// Užtikriname žemėlapio dydžio atnaujinimą keičiantis ekrano dydžiui (ypač išmaniajame)
 window.addEventListener('resize', function() {
     map.invalidateSize();
 });
 
 let markerGroup = L.featureGroup().addTo(map);
-let userCoords = null;
+let userCoords = null; // Store user coordinates globally for distance filtering
 
 async function fetchAndDisplayPlaces(params = {}) {
     try {
@@ -123,6 +127,7 @@ async function fetchAndDisplayPlaces(params = {}) {
         }
         let places = await response.json();
         
+        // Handle distance filtering client-side if a distance limit is selected and user location is available
         const distanceSelect = document.getElementById('distance-select');
         const maxDistance = distanceSelect && distanceSelect.value ? parseFloat(distanceSelect.value) : null;
 
@@ -174,14 +179,14 @@ async function fetchAndDisplayPlaces(params = {}) {
                 marker.bindPopup(`
                     <div style="width: 220px; text-align: left;">
                         ${place.image_url ? `<img src="${place.image_url}" alt="${place.name || ''}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 4px; margin-bottom: 8px;">` : ''}
-                        <div style="font-size: 13px; line-height: 1.4; text-align: left;">
-                            <b style="color: #ff9800;">Name:</b> ${place.name || ''}<br>
-                            <b style="color: #ff9800;">Name Original:</b> ${place.name_original || ''}<br>
-                            <b style="color: #ff9800;">Address:</b> ${place.address || ''}<br>
-                            <b style="color: #ff9800;">Public Stops:</b> ${place.public_stops || ''}<br>
-                            <b style="color: #ff9800;">Theme:</b> ${place.theme || ''}<br>
-                            <b style="color: #ff9800;">Tops:</b> ${place.tops || ''}<br>
-                            <b style="color: #ff9800;">Description:</b> ${place.description || ''}<br>
+                        <div style="font-size: 13px; line-height: 1.4;">
+                            <b>Theme:</b> ${place.theme || ''}<br>
+                            <b>Name:</b> ${place.name || ''}<br>
+                            <b>Name Original:</b> ${place.name_original || ''}<br>
+                            <b>Address:</b> ${place.address || ''}<br>
+                            <b>Public Stop:</b> ${place.public_stop || ''}<br>
+                            <b>Tops:</b> ${place.tops || ''}<br>
+                            <b>Description:</b> ${place.description || ''}<br>
                         </div>
                     </div>
                 `);
@@ -230,6 +235,7 @@ function findUserLocation() {
     }
 }
 
+// Optimizuota filtravimo užkrova iš naujojo lengvo metaduomenų endpoint'o
 async function initFilters() {
     try {
         const response = await fetch('/api/filters-meta/');
@@ -239,17 +245,15 @@ async function initFilters() {
         const topsSelect = document.getElementById('tops-select');
         const themeSelect = document.getElementById('theme-select');
         
-        data.cities.forEach(item => {
+        data.cities.forEach(city => {
             const option = document.createElement('option');
-            const cityName = typeof item === 'object' && item !== null ? item.name : item;
-            const cityCount = typeof item === 'object' && item !== null ? item.count : null;
-            
-            option.value = cityName;
-            option.textContent = cityCount ? `${cityName} (${cityCount})` : cityName;
+            option.value = city;
+            option.textContent = city;
             citySelect.appendChild(option);
         });
         
         if (data.tops) {
+            // Surikiuojame tops didėjimo tvarka ir sudedame į select
             const sortedTops = [...data.tops].sort((a, b) => Number(a) - Number(b));
             sortedTops.forEach(tops => {
                 const option = document.createElement('option');
@@ -271,6 +275,7 @@ async function initFilters() {
     }
 }
 
+// Paieškos ir filtravimo logika
 const searchInput = document.getElementById('search-input');
 const searchButton = document.getElementById('search-button');
 const showAllButton = document.getElementById('show-all-button');
@@ -311,6 +316,7 @@ if (themeSelect) themeSelect.addEventListener('change', applyAllFilters);
 if (topsSelect) topsSelect.addEventListener('change', applyAllFilters);
 if (distanceSelect) distanceSelect.addEventListener('change', applyAllFilters);
 
+// Pradinis funkcijų iškvietimas
 fetchAndDisplayPlaces();
 findUserLocation();
 initFilters();
