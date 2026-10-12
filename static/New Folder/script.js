@@ -69,24 +69,27 @@ const themeColors = {
     'Waterfronts & Beaches': '#FFD700'
 };
 
-// Pakeista į L.divIcon, kad išlaikytų absoliutų tikslumą ir nesislinktų bei neišplauktų keičiant zoom
+// Pakeista į L.icon su data URL, kad keičiant zoom žymeklis nešokinėtų ir nesislankiotų
 const iconCache = {};
 
 function createSvgIcon(color) {
     if (iconCache[color]) return iconCache[color];
 
-    const divIcon = L.divIcon({
-        className: 'custom-svg-marker',
-        html: `<svg xmlns="http://www.w3.org/2000/svg" width="30" height="45" viewBox="0 0 24 24" fill="${color}">
-            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-        </svg>`,
+    const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="30" height="45" viewBox="0 0 24 24" fill="${color}">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+    </svg>`;
+    
+    const encoded = encodeURIComponent(svgString);
+    
+    const svgIcon = L.icon({
+        iconUrl: `data:image/svg+xml;charset=utf-8,${encoded}`,
         iconSize: [30, 45],
         iconAnchor: [15, 45],
         popupAnchor: [0, -45]
     });
 
-    iconCache[color] = divIcon;
-    return divIcon;
+    iconCache[color] = svgIcon;
+    return svgIcon;
 }
 
 function getMarkerColor(theme) {
@@ -107,7 +110,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 }
 
 // Initialize the map
-const map = L.map('map');
+const map = L.map('map').setView([54.643, 24.805], 16);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -155,8 +158,6 @@ async function fetchAndDisplayPlaces(params = {}) {
         markerGroup.clearLayers();
         
         if (places.length === 0) {
-            alert("No places found.");
-            map.setView([52.5, 10.5], 5);
             return;
         }
 
@@ -194,11 +195,6 @@ async function fetchAndDisplayPlaces(params = {}) {
                 foundMarkers.push(marker);
             }
         });
-        
-        if (foundMarkers.length > 0) {
-            const foundGroup = L.featureGroup(foundMarkers);
-            map.fitBounds(foundGroup.getBounds(), {padding: [50, 50]});
-        }
     } catch (error) {
         console.error('Error fetching data:', error);
     }
@@ -237,7 +233,6 @@ function findUserLocation() {
 
         function onLocationError(e) {
             console.error('Error getting location:', e.message);
-            alert("Nepavyko aptikti jūsų vietos: " + e.message);
         }
     } else {
         console.log("Geolocation support is not available.");
@@ -262,7 +257,6 @@ async function initFilters() {
         });
         
         if (data.tops) {
-            // Surikiuojame tops didėjimo tvarka ir sudedame į select
             const sortedTops = [...data.tops].sort((a, b) => Number(a) - Number(b));
             sortedTops.forEach(tops => {
                 const option = document.createElement('option');

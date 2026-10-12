@@ -73,7 +73,7 @@ function createSvgIcon(color) {
     if (iconCache[color]) return iconCache[color];
 
     const svgContent = `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${color}">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="${color}">
             <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
         </svg>
     `;
@@ -110,6 +110,8 @@ window.addEventListener('resize', function() {
 
 let markerGroup = L.featureGroup().addTo(map);
 let userCoords = null;
+let userMarker = null;
+let userCircle = null;
 
 async function fetchAndDisplayPlaces(params = {}) {
     try {
@@ -163,9 +165,9 @@ async function fetchAndDisplayPlaces(params = {}) {
                 const color = getMarkerColor(place.theme);
                 const customIcon = L.icon({
                     iconUrl: createSvgIcon(color),
-                    iconSize: [30, 45],
-                    iconAnchor: [15, 45],
-                    popupAnchor: [0, -45]
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 32],
+                    popupAnchor: [0, -32]
                 });
 
                 const marker = L.marker([lat, lon], {icon: customIcon});
@@ -202,21 +204,27 @@ function findUserLocation() {
         map.on('locationfound', onLocationFound);
         map.on('locationerror', onLocationError);
 
-        map.locate({setView: true, maxZoom: 16});
+        map.locate({setView: true, watch: true, maxZoom: 16, enableHighAccuracy: true});
 
         function onLocationFound(e) {
             userCoords = { lat: e.latlng.lat, lon: e.latlng.lng };
             const radius = e.accuracy;
             const userIcon = L.icon({
                 iconUrl: createSvgIcon('#007AFF'),
-                iconSize: [30, 45],
-                iconAnchor: [15, 45],
-                popupAnchor: [0, -45]
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+                popupAnchor: [0, -32]
             });
 
-            L.marker(e.latlng, {icon: userIcon}).addTo(map)
-                .bindPopup("You are here").openPopup();
-            L.circle(e.latlng, radius).addTo(map);
+            if (!userMarker) {
+                userMarker = L.marker(e.latlng, {icon: userIcon}).addTo(map)
+                    .bindPopup("You are here");
+                userCircle = L.circle(e.latlng, radius).addTo(map);
+            } else {
+                userMarker.setLatLng(e.latlng);
+                userCircle.setLatLng(e.latlng);
+                userCircle.setRadius(radius);
+            }
         }
 
         function onLocationError(e) {
