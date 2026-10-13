@@ -1,6 +1,4 @@
-#!/bin/sh
-'''exec' "/home/www/guidessys/1 _guides_testing/venv/bin/python3" "$0" "$@"
-' '''
+#!/home/www/guides_sys_test/venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys
