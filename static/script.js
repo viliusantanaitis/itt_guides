@@ -112,6 +112,7 @@ let markerGroup = L.featureGroup().addTo(map);
 let userCoords = null;
 let userMarker = null;
 let userCircle = null;
+let isFirstLocation = true; // Pridėtas kintamasis zoom išlaikymui
 
 async function fetchAndDisplayPlaces(params = {}) {
     try {
@@ -204,7 +205,8 @@ function findUserLocation() {
         map.on('locationfound', onLocationFound);
         map.on('locationerror', onLocationError);
 
-        map.locate({setView: true, watch: true, maxZoom: 16, enableHighAccuracy: true});
+        // Pakeista: pašalintas 'setView: true', kad automatiškai nekeistų zoom lygio
+        map.locate({watch: true, maxZoom: 16, enableHighAccuracy: true});
 
         function onLocationFound(e) {
             userCoords = { lat: e.latlng.lat, lon: e.latlng.lng };
@@ -224,6 +226,14 @@ function findUserLocation() {
                 userMarker.setLatLng(e.latlng);
                 userCircle.setLatLng(e.latlng);
                 userCircle.setRadius(radius);
+            }
+
+            // Pakeista: pirmą kartą nustatome vaizdą su zoom, o vėliau tik pastumiame per panTo (nekeisdami zoom)
+            if (isFirstLocation) {
+                map.setView(e.latlng, 16);
+                isFirstLocation = false;
+            } else {
+                map.panTo(e.latlng);
             }
         }
 
